@@ -32,6 +32,9 @@ class MaEngine {
             }
         }
 
+        MaEngine(const MaEngine&) = delete;
+        MaEngine& operator=(const MaEngine&) = delete;
+
         ma_engine* get() const {
             return engine;
         }
@@ -63,6 +66,9 @@ class MaSound {
                 free(sound);
             }
         }
+        
+        MaSound(const MaSound&) = delete;
+        MaSound& operator=(const MaSound&) = delete;
 
         ma_sound* get() const {
             return sound;
