@@ -45,17 +45,12 @@ class MaEngine {
  */
 class MaSound {
     public:
-        /**
-         * Constructor for MaSound
-         * @param pEngine The miniaudio engine to use
-         * @param filePath The path to the audio file (can be relative or absolute)
-         */
-        MaSound(ma_engine* pEngine, const std::string& filePath) {
+        MaSound(MaEngine* engine, const std::string& filePath) {
             sound = (ma_sound*)malloc(sizeof(ma_sound));
             if (sound == nullptr) throw std::runtime_error("Failed to allocate memory for ma_sound.");
             //                      ^ TODO: Maybe don't throw, need to consider this later
 
-            if (ma_sound_init_from_file(pEngine, filePath.c_str(), 0, NULL, NULL, sound) != MA_SUCCESS) {
+            if (ma_sound_init_from_file(engine->get(), filePath.c_str(), 0, NULL, NULL, sound) != MA_SUCCESS) {
                 free(sound);
                 throw std::runtime_error("Failed to initialize ma_sound from file: " + filePath);
                 // TODO: Maybe don't throw, need to consider this later
@@ -77,3 +72,19 @@ class MaSound {
         ma_sound* sound;
 };
 
+
+class AudioEngine {
+    public:
+        AudioEngine(ma_device_id* deviceId);
+        ~AudioEngine();
+
+        // path can be relative or absolute
+        MaSound createSound(const std::string& path) const;
+
+        void play(MaSound* sound) const;
+        void stop(MaSound* sound) const;
+        void restart(MaSound* sound) const;
+
+    private:
+        MaEngine* engine;
+};
