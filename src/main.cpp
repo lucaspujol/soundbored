@@ -1,7 +1,7 @@
 #include "ui/UI.hpp"
 
 int main(void) {
-    UI ui { 800, 600, "SoundBored" };
+    UI ui { 1280, 800, "SoundBored" };
     while (!ui.shouldClose()) {
         ui.frame();
     }
