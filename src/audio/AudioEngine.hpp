@@ -10,12 +10,15 @@
  */
 class MaEngine {
     public:
-        MaEngine() {
+        MaEngine(ma_device_id* deviceID) {
+            ma_engine_config engineConfig = ma_engine_config_init();
+            engineConfig.pPlaybackDeviceID = deviceID;
+
             engine = (ma_engine*)malloc(sizeof(ma_engine));
             if (engine == nullptr) throw std::runtime_error("Failed to allocate memory for ma_engine.");
             //                       ^ TODO: Maybe don't throw, need to consider this later
 
-            if (ma_engine_init(NULL, engine) != MA_SUCCESS) {
+            if (ma_engine_init(&engineConfig, engine) != MA_SUCCESS) {
                 free(engine);
                 throw std::runtime_error("Failed to initialize ma_engine.");
                 // TODO: Maybe don't throw, need to consider this later
