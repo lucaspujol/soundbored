@@ -1,0 +1,1 @@
+Bored of every soundboard app being behind a paywall? We are too! SoundBored is here to fix that
