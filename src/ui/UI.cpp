@@ -1,5 +1,3 @@
-#include "raylib.h"
-#include <iostream>
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
 #include "clay_renderer_raylib.h"
@@ -9,10 +7,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <filesystem>
-#include <string>
-#include <string_view>
 
 namespace {
 
