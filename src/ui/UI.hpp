@@ -21,4 +21,8 @@ private:
 
     std::unique_ptr<char[]> clayMemory;
     std::vector<Font> fonts;
+
+    // helpers
+    void renderLogo() const;
+    void renderSearchBar() const;
 };

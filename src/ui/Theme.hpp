@@ -21,5 +21,30 @@ namespace theme {
     inline constexpr Clay_Color blue     = {  94, 168, 242, 255 };
     inline constexpr Clay_Color purple   = { 182, 144, 242, 255 };
     inline constexpr Clay_Color green    = {  79, 191, 128, 255 };
-    inline constexpr Clay_Color red      = { 240, 100,  95, 255 };    
+    inline constexpr Clay_Color red      = { 240, 100,  95, 255 };
+
+    namespace font {
+        inline constexpr uint16_t display_semibold = 0;     // headings
+        inline constexpr uint16_t display_bold     = 1;     // logo
+        inline constexpr uint16_t sans_regular     = 2;     // body
+        inline constexpr uint16_t sans_medium      = 3;     // ui
+        inline constexpr uint16_t sans_semibold    = 4;     // ui emphasis
+        inline constexpr uint16_t mono_medium      = 5;     // key chips, times, percentages
+    }
+
+    inline constexpr Clay_Sizing expand = {
+        .width = CLAY_SIZING_GROW(0),
+        .height = CLAY_SIZING_GROW(0),
+    };
+
+    inline constexpr Clay_TextElementConfig bodyText {
+        .textColor = text_primary,
+        .fontId = font::sans_regular,
+        .fontSize = 20,
+    };
+
+    // layout constants
+    inline constexpr size_t header_size_px = 64;
+    inline constexpr size_t footer_size_px = 64;
+    inline constexpr size_t sidebar_width_px = 284;
 }
