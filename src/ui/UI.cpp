@@ -7,12 +7,17 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdio>
 #include <filesystem>
+#include <iostream>
+#include <string>
+#include <string_view>
 
 namespace {
 
+// Clay_String isn't null-terminated: print with an explicit length
 void handleClayErrors(Clay_ErrorData errorData) {
-    std::fprintf(stderr, "clay: %s\n", errorData.errorText.chars);
+    std::fprintf(stderr, "clay: %.*s\n", errorData.errorText.length, errorData.errorText.chars);
 }
 
 struct FontFile {
@@ -36,6 +41,37 @@ static_assert(std::ranges::all_of(
         return font.id < fontFiles.size();
     }),
     "font id without a matching entry in fontFiles");
+
+bool Button(Clay_String text, Texture2D *icon, const theme::ButtonStyle &style) {
+    bool clicked = false;
+
+    CLAY(CLAY_SID(text), Clay_ElementDeclaration{
+        .layout = {
+            .padding = { 16, 16, 16, 16 },
+            .childGap = 8,
+            .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+        },
+        .backgroundColor = Clay_Hovered() ? style.backgroundHover : style.background,
+        .cornerRadius = CLAY_CORNER_RADIUS(12),
+        .border = { .color = style.border, .width = CLAY_BORDER_OUTSIDE(1) },
+    }) {
+        clicked = Clay_Hovered() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+
+        if (icon) {
+            CLAY_AUTO_ID(Clay_ElementDeclaration{
+                .layout = { .sizing = { CLAY_SIZING_FIXED(16), CLAY_SIZING_FIXED(16) } },
+                .backgroundColor = style.content,
+                .image = { .imageData = icon },
+            }) {}
+        }
+        CLAY_TEXT(text, Clay_TextElementConfig{
+            .textColor = style.content,
+            .fontId = theme::font::sans_medium,
+            .fontSize = 20,
+        });
+    }
+    return clicked;
+}
 
 }
 
@@ -79,10 +115,8 @@ void UI::frame() {
     Clay_SetPointerState({ mouse.x, mouse.y }, IsMouseButtonDown(MOUSE_BUTTON_LEFT));
 
     // debug panel
-    bool debugEnabled = Clay_IsDebugModeEnabled();
     if (IsKeyPressed(KEY_D)) {
-        debugEnabled = !debugEnabled;
-        Clay_SetDebugModeEnabled(debugEnabled);
+        Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
     }
 
     // layout computing
@@ -100,7 +134,7 @@ void UI::frame() {
 void UI::buildLayout() {
     CLAY(CLAY_ID("root"), Clay_ElementDeclaration {
         .layout = {
-            .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0), },
+            .sizing = theme::expand,
             .layoutDirection = CLAY_TOP_TO_BOTTOM,
         },
         .backgroundColor = theme::background,
@@ -119,10 +153,7 @@ void UI::buildLayout() {
             CLAY(CLAY_ID("logo"), Clay_ElementDeclaration{
                 .layout = {
                     .sizing = {
-                        CLAY_SIZING_GROW(
-                            .min = 200,
-                            .max = theme::sidebar_width_px
-                        ),
+                        CLAY_SIZING_FIXED(theme::sidebar_width_px),
                         CLAY_SIZING_GROW(0),
                     },
                     .padding = { .left = 20, },
@@ -142,10 +173,26 @@ void UI::buildLayout() {
                     .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
                 },
             }) { renderSearchBar(); }
+            CLAY(CLAY_ID("spacer"), { .layout = { .sizing = { CLAY_SIZING_GROW(0) } } }) {}
+            CLAY(CLAY_ID("headerButtons"), Clay_ElementDeclaration{
+                .layout = {
+                    .sizing = { .height = CLAY_SIZING_GROW(0), },
+                    .padding = { .right = 20, },
+                    .childGap = 8,
+                    .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+                },
+            }) {
+                if (Button(CLAY_STRING("Import"), nullptr, theme::secondaryButton)) {
+                    std::cout << "Import button clicked" << std::endl;
+                }
+                if (Button(CLAY_STRING("Stop all"), nullptr, theme::dangerButton)) {
+                    std::cout << "Stop all button clicked" << std::endl;
+                }
+            }
         }
         CLAY(CLAY_ID("mainContent"), Clay_ElementDeclaration{
             .layout = {
-                .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0), },
+                .sizing = theme::expand,
                 .layoutDirection = CLAY_LEFT_TO_RIGHT,
             },
             .backgroundColor = theme::background,
@@ -153,10 +200,7 @@ void UI::buildLayout() {
             CLAY(CLAY_ID("sidebar"), Clay_ElementDeclaration{
                 .layout = {
                     .sizing = {
-                        CLAY_SIZING_GROW(
-                            .min = 200,
-                            .max = theme::sidebar_width_px
-                        ),
+                        CLAY_SIZING_FIXED(theme::sidebar_width_px),
                         CLAY_SIZING_GROW(0),
                     },
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
@@ -169,7 +213,7 @@ void UI::buildLayout() {
             }) {}
             CLAY(CLAY_ID("contentArea"), Clay_ElementDeclaration{
                 .layout = {
-                    .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0), },
+                    .sizing = theme::expand,
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
                 },
                 .backgroundColor = theme::background,
@@ -190,8 +234,8 @@ void UI::buildLayout() {
 }
 
 void UI::renderLogo() const {
-    uint16_t fontId = theme::font::display_bold;
-    uint16_t fontSize = 32;
+    const uint16_t fontId = theme::font::display_bold;
+    const uint16_t fontSize = 32;
 
     CLAY_TEXT(CLAY_STRING("sound"), CLAY_TEXT_CONFIG({
         .textColor = theme::text_primary,
