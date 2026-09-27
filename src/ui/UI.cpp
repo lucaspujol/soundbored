@@ -20,12 +20,18 @@ void handleClayErrors(Clay_ErrorData errorData) {
     std::fprintf(stderr, "clay: %.*s\n", errorData.errorText.length, errorData.errorText.chars);
 }
 
-struct FontFile {
+struct AssetFile {
     uint16_t id;
     std::string_view file;
 };
 
-constexpr auto fontFiles = std::to_array<FontFile>({
+// assets are stored at assets[id], so every id must fit inside its table
+template <size_t N>
+constexpr bool idsFitTable(const std::array<AssetFile, N> &table) {
+    return std::ranges::all_of(table, [](const AssetFile &asset) { return asset.id < N; });
+}
+
+constexpr auto fontFiles = std::to_array<AssetFile>({
     { theme::font::display_semibold, "BricolageGrotesque-SemiBold.ttf" },
     { theme::font::display_bold,     "BricolageGrotesque-Bold.ttf" },
     { theme::font::sans_regular,     "IBMPlexSans-Regular.ttf" },
@@ -33,14 +39,22 @@ constexpr auto fontFiles = std::to_array<FontFile>({
     { theme::font::sans_semibold,    "IBMPlexSans-SemiBold.ttf" },
     { theme::font::mono_medium,      "IBMPlexMono-Medium.ttf" },
 });
+static_assert(idsFitTable(fontFiles), "font id without a matching entry in fontFiles");
 
-// if a font id is used, it must have a matching entry in fontFiles.
-static_assert(std::ranges::all_of(
-    fontFiles,
-    [](const FontFile &font) {
-        return font.id < fontFiles.size();
-    }),
-    "font id without a matching entry in fontFiles");
+constexpr auto iconFiles = std::to_array<AssetFile>({
+    { theme::icon::upload, "upload.png" },
+    { theme::icon::stop,     "stop.png" },
+});
+static_assert(idsFitTable(iconFiles), "icon id without a matching entry in iconFiles");
+
+// Only the icon's alpha channel matters: its color comes from the element's overlayColor at draw time.
+// Mipmaps + trilinear let the GPU pick a pre-shrunk copy for any display size, so the source resolution doesn't matter.
+Texture2D loadIcon(const std::filesystem::path &path) {
+    Texture2D texture = LoadTexture(path.string().c_str());
+    GenTextureMipmaps(&texture);
+    SetTextureFilter(texture, TEXTURE_FILTER_TRILINEAR);
+    return texture;
+}
 
 bool Button(Clay_String text, Texture2D *icon, const theme::ButtonStyle &style) {
     bool clicked = false;
@@ -59,15 +73,17 @@ bool Button(Clay_String text, Texture2D *icon, const theme::ButtonStyle &style) 
 
         if (icon) {
             CLAY_AUTO_ID(Clay_ElementDeclaration{
-                .layout = { .sizing = { CLAY_SIZING_FIXED(16), CLAY_SIZING_FIXED(16) } },
-                .backgroundColor = style.content,
+                .layout = { .sizing = { CLAY_SIZING_FIXED(theme::icon_size_px), CLAY_SIZING_FIXED(theme::icon_size_px) } },
+                // overlay, not backgroundColor: backgroundColor also emits a solid rectangle over the image.
+                // the overlay shader keeps the texture's alpha, so this paints the icon's shape in `content`
+                .overlayColor = style.content,
                 .image = { .imageData = icon },
             }) {}
         }
         CLAY_TEXT(text, Clay_TextElementConfig{
             .textColor = style.content,
-            .fontId = theme::font::sans_medium,
-            .fontSize = 20,
+            .fontId = theme::font::sans_semibold,
+            .fontSize = 24,
         });
     }
     return clicked;
@@ -86,18 +102,28 @@ UI::UI(int width, int height, const char *title) {
     Clay_Initialize(arena, { (float)width, (float)height }, { handleClayErrors, nullptr });
     Clay_SetDebugModeEnabled(false);
 
-    fonts.resize(fontFiles.size());
     using fpath = std::filesystem::path;
-    const fpath fontDir = fpath(GetApplicationDirectory()) / "assets" / "fonts";
-    for (const FontFile &font : fontFiles) {
-        const std::string path = (fontDir / font.file).string();
+    const fpath assetDir = fpath(GetApplicationDirectory()) / "assets";
+
+    fonts.resize(fontFiles.size());
+    for (const AssetFile &font : fontFiles) {
+        const std::string path = (assetDir / "fonts" / font.file).string();
         fonts[font.id] = LoadFontEx(path.c_str(), 48, nullptr, 400);
         SetTextureFilter(fonts[font.id].texture, TEXTURE_FILTER_BILINEAR);
     }
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts.data());
+
+    // sized once here and never resized: Clay holds pointers into it as imageData
+    icons.resize(iconFiles.size());
+    for (const AssetFile &icon : iconFiles) {
+        icons[icon.id] = loadIcon(assetDir / "icons" / icon.file);
+    }
 }
 
 UI::~UI() {
+    for (auto &icon : icons) {
+        UnloadTexture(icon);
+    }
     for (auto &font : fonts) {
         UnloadFont(font);
     }
@@ -182,10 +208,10 @@ void UI::buildLayout() {
                     .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
                 },
             }) {
-                if (Button(CLAY_STRING("Import"), nullptr, theme::secondaryButton)) {
+                if (Button(CLAY_STRING("Import"), &icons[theme::icon::upload], theme::secondaryButton)) {
                     std::cout << "Import button clicked" << std::endl;
                 }
-                if (Button(CLAY_STRING("Stop all"), nullptr, theme::dangerButton)) {
+                if (Button(CLAY_STRING("Stop all"), &icons[theme::icon::stop], theme::dangerButton)) {
                     std::cout << "Stop all button clicked" << std::endl;
                 }
             }

@@ -21,6 +21,7 @@ private:
 
     std::unique_ptr<char[]> clayMemory;
     std::vector<Font> fonts;
+    std::vector<Texture2D> icons;
 
     // helpers
     void renderLogo() const;
