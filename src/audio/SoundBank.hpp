@@ -7,7 +7,8 @@
 #include <map>
 #include <memory>
 
-using SoundId = uint32_t;
+// actual ids will be > 0, -1 is used to indicate failure for sound related stuff
+using SoundId = int32_t;
 
 class SoundBank {
     public:
