@@ -17,19 +17,38 @@ namespace theme {
     inline constexpr Clay_Color text_tertiary  = { 150, 150, 160, 255 };
 
     // accents
-    inline constexpr Clay_Color orange   = { 240, 138,  66, 255 };
-    inline constexpr Clay_Color blue     = {  94, 168, 242, 255 };
-    inline constexpr Clay_Color purple   = { 182, 144, 242, 255 };
-    inline constexpr Clay_Color green    = {  79, 191, 128, 255 };
-    inline constexpr Clay_Color red      = { 240, 100,  95, 255 };
+    inline constexpr Clay_Color orange      = { 240, 138,  66, 255 };
+    inline constexpr Clay_Color blue        = {  94, 168, 242, 255 };
+    inline constexpr Clay_Color purple      = { 182, 144, 242, 255 };
+    inline constexpr Clay_Color green       = {  79, 191, 128, 255 };
+    inline constexpr Clay_Color red         = { 240, 100,  95, 255 };
 
+    // danger (destructive actions): deeper than the red accent
+    inline constexpr Clay_Color danger       = { 210,  45,  45, 255 };
+    inline constexpr Clay_Color danger_hover = { 232,  62,  62, 255 };
+
+    inline constexpr Clay_Color transparent = { 0, 0, 0, 0 };
+
+    // font faces. Each face is loaded at a pixel size the first time that size is used (see FontCache)
     namespace font {
-        inline constexpr uint16_t display_semibold = 0;     // headings
-        inline constexpr uint16_t display_bold     = 1;     // logo
-        inline constexpr uint16_t sans_regular     = 2;     // body
-        inline constexpr uint16_t sans_medium      = 3;     // ui
-        inline constexpr uint16_t sans_semibold    = 4;     // ui emphasis
-        inline constexpr uint16_t mono_medium      = 5;     // key chips, times, percentages
+        enum Face : uint16_t {
+            display_semibold,   // headings
+            display_bold,       // logo
+            sans_regular,       // body
+            sans_medium,        // ui
+            sans_semibold,      // ui emphasis
+            mono_medium,        // key chips, times, percentages
+            face_count,
+        };
+    }
+
+    // icon ids: index into Icons
+    namespace icon {
+        enum Id : uint16_t {
+            upload,
+            stop,
+            icon_count,
+        };
     }
 
     inline constexpr Clay_Sizing expand = {
@@ -37,14 +56,30 @@ namespace theme {
         .height = CLAY_SIZING_GROW(0),
     };
 
-    inline constexpr Clay_TextElementConfig bodyText {
-        .textColor = text_primary,
-        .fontId = font::sans_regular,
-        .fontSize = 20,
+    // layout constants
+    inline constexpr size_t header_size_px = 90;
+    inline constexpr size_t footer_size_px = 90;
+    inline constexpr size_t sidebar_width_px = 284;
+    inline constexpr size_t icon_size_px = 16;
+
+    struct ButtonStyle {
+        Clay_Color background;
+        Clay_Color backgroundHover;
+        Clay_Color border;
+        Clay_Color content;
     };
 
-    // layout constants
-    inline constexpr size_t header_size_px = 64;
-    inline constexpr size_t footer_size_px = 64;
-    inline constexpr size_t sidebar_width_px = 284;
+    inline constexpr ButtonStyle secondaryButton {
+        .background = control,
+        .backgroundHover = selected,
+        .border = strong_sep,
+        .content = text_primary,
+    };
+
+    inline constexpr ButtonStyle dangerButton {
+        .background = danger,
+        .backgroundHover = danger_hover,
+        .border = transparent,
+        .content = text_primary,
+    };
 }

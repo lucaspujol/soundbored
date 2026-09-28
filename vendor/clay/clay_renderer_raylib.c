@@ -219,7 +219,8 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
                 // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
                 memcpy(temp_render_buffer, textData->stringContents.chars, textData->stringContents.length);
                 temp_render_buffer[textData->stringContents.length] = '\0';
-                DrawTextEx(fontToUse, temp_render_buffer, (Vector2){boundingBox.x, boundingBox.y}, (float)textData->fontSize, (float)textData->letterSpacing, CLAY_COLOR_TO_RAYLIB_COLOR(textData->textColor));
+                // snapped to whole pixels: a fractional origin blends every glyph across two pixels (blur)
+                DrawTextEx(fontToUse, temp_render_buffer, (Vector2){roundf(boundingBox.x), roundf(boundingBox.y)}, (float)textData->fontSize, (float)textData->letterSpacing, CLAY_COLOR_TO_RAYLIB_COLOR(textData->textColor));
     
                 break;
             }
@@ -232,7 +233,8 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands, Font* fonts)
                 DrawTexturePro(
                     imageTexture,
                     (Rectangle) { 0, 0, imageTexture.width, imageTexture.height },
-                    (Rectangle){boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height},
+                    // snapped to whole pixels, same reason as text
+                    (Rectangle){roundf(boundingBox.x), roundf(boundingBox.y), roundf(boundingBox.width), roundf(boundingBox.height)},
                     (Vector2) { 0 },
                     0,
                     CLAY_COLOR_TO_RAYLIB_COLOR(tintColor));

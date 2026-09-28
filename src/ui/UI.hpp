@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include "raylib.h"
+class FontCache;
+class Icons;
 
 class UI {
 public:
@@ -20,9 +20,6 @@ private:
     void buildLayout();
 
     std::unique_ptr<char[]> clayMemory;
-    std::vector<Font> fonts;
-
-    // helpers
-    void renderLogo() const;
-    void renderSearchBar() const;
+    std::unique_ptr<FontCache> fonts;
+    std::unique_ptr<Icons> icons;
 };
