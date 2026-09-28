@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 /**
  * @brief A RAII wrapper class for miniaudio context (ma_context)
@@ -33,6 +34,11 @@ struct DeviceInfo {
     std::string name;
     ma_device_id id;
     bool isDefault;
+};
+
+struct SoundMeta {
+    std::string path;
+    // later can add volume, keybind, etc
 };
 
 
@@ -78,6 +84,8 @@ class AudioManager {
 
         static const int MIN_SOUND_ID = 0;
         SoundId nextSoundId = MIN_SOUND_ID;
+        std::map<SoundId, SoundMeta> soundMetaMap;
+
         std::vector<DeviceInfo> cachedDevices;
 
         void refreshDeviceCache();

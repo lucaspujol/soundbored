@@ -18,11 +18,10 @@ bool AudioManager::setPhysicalDevice(std::string dName) {
     ma_device_id newDeviceId = {};
     if (!resolveDeviceName(dName, &newDeviceId)) return false;
 
-    std::map<SoundId, std::string> soundMap = physicalSoundBank->getSoundMap();
     physicalEngine = std::make_unique<AudioEngine>(&newDeviceId);
     physicalSoundBank = std::make_unique<SoundBank>(*physicalEngine);
-    for (const auto& pair : soundMap) {
-        if (!physicalSoundBank->loadSound(pair.first, pair.second)) {
+    for (const auto& pair : soundMetaMap) {
+        if (!physicalSoundBank->loadSound(pair.first, pair.second.path)) {
             return false;
         }
     }
@@ -33,11 +32,10 @@ bool AudioManager::setVirtualDevice(std::string dName) {
     ma_device_id newDeviceId = {};
     if (!resolveDeviceName(dName, &newDeviceId)) return false;
 
-    std::map<SoundId, std::string> soundMap = physicalSoundBank->getSoundMap();
     virtualEngine = std::make_unique<AudioEngine>(&newDeviceId);
     virtualSoundBank = std::make_unique<SoundBank>(*virtualEngine);
-    for (const auto& pair : soundMap) {
-        if (!virtualSoundBank->loadSound(pair.first, pair.second)) {
+    for (const auto& pair : soundMetaMap) {
+        if (!virtualSoundBank->loadSound(pair.first, pair.second.path)) {
             return false;
         }
     }
@@ -58,12 +56,16 @@ int32_t AudioManager::importSound(std::string path) {
         return -1;
     }
 
+    soundMetaMap[nextSoundId] = { path };
     return nextSoundId++;
 }
 
 void AudioManager::removeSound(SoundId id) {
     if (physicalSoundBank) physicalSoundBank->unloadSound(id);
     if (virtualSoundBank)  virtualSoundBank->unloadSound(id);
+    if (soundMetaMap.find(id) != soundMetaMap.end()) {
+        soundMetaMap.erase(id);
+    }
 }
 
 void AudioManager::playSound(SoundId id) {

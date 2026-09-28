@@ -2,10 +2,11 @@
 
 #include "AudioEngine.hpp"
 
-#include <cstdint>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 #include <memory>
+#include <cstdint>
 
 // actual ids will be > 0, -1 is used to indicate failure for sound related stuff
 using SoundId = int32_t;
@@ -23,12 +24,9 @@ class SoundBank {
         void restart(SoundId id);
         
         bool hasSound(SoundId id) const;
-        bool hasSound(std::string path) const;
-        std::string getSoundPath(SoundId id) const;
-        std::map<SoundId, std::string> getSoundMap() const;
+        std::vector<SoundId> getAllSoundIds() const;
 
     private:
         AudioEngine& engine;  // non-owning reference (engine owned by AudioManager)
         std::map<SoundId, std::unique_ptr<MaSound>> sounds;
-        std::map<SoundId, std::string> paths;
 };
