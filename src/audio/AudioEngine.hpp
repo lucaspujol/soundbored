@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
+#include <sys/types.h>
 
 /**
  * A RAII wrapper class for miniaudio engine (ma_engine)
@@ -45,6 +46,28 @@ class MaSound {
 
         ~MaSound() { ma_sound_uninit(&sound); }
         ma_sound* get() { return &sound; }
+
+        uint64_t getLengthMs() const {
+            ma_uint64 lengthInFrames;
+            if (ma_sound_get_length_in_pcm_frames(const_cast<ma_sound*>(&sound), &lengthInFrames) != MA_SUCCESS) {
+                throw std::runtime_error("Failed to get sound length in PCM frames.");
+            }
+            ma_uint32 sampleRate = ma_engine_get_sample_rate(const_cast<ma_engine*>(ma_sound_get_engine(&sound)));
+            return static_cast<uint64_t>(lengthInFrames) * 1000 / sampleRate;
+        }
+
+        uint64_t getRemainingLengthMs() const {
+            ma_uint64 currentFrame;
+            if (ma_sound_get_cursor_in_pcm_frames(const_cast<ma_sound*>(&sound), &currentFrame) != MA_SUCCESS) {
+                throw std::runtime_error("Failed to get sound cursor in PCM frames.");
+            }
+            ma_uint64 lengthInFrames;
+            if (ma_sound_get_length_in_pcm_frames(const_cast<ma_sound*>(&sound), &lengthInFrames) != MA_SUCCESS) {
+                throw std::runtime_error("Failed to get sound length in PCM frames.");
+            }
+            ma_uint32 sampleRate = ma_engine_get_sample_rate(const_cast<ma_engine*>(ma_sound_get_engine(&sound)));
+            return static_cast<uint64_t>(lengthInFrames - currentFrame) * 1000 / sampleRate;
+        }
 
         MaSound(const MaSound&) = delete;
         MaSound& operator=(const MaSound&) = delete;
