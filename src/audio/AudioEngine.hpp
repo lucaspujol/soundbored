@@ -3,6 +3,7 @@
 #include <miniaudio.h>
 
 #include <string>
+#include <memory>
 #include <stdexcept>
 
 /**
@@ -47,21 +48,8 @@ class MaSound {
 
         MaSound(const MaSound&) = delete;
         MaSound& operator=(const MaSound&) = delete;
-
-        MaSound(MaSound&& other) noexcept
-            : sound(other.sound)
-        {
-            other.sound = {};  // zero out moved-from object
-        }
-
-        MaSound& operator=(MaSound&& other) noexcept {
-            if (this != &other) {
-                ma_sound_uninit(&sound);
-                sound = other.sound;
-                other.sound = {};
-            }
-            return *this;
-        }
+        MaSound(MaSound&&) = delete;
+        MaSound& operator=(MaSound&&) = delete;
 
     private:
         ma_sound sound;
@@ -74,7 +62,7 @@ class AudioEngine {
         ~AudioEngine() = default;
 
         // path can be relative or absolute
-        MaSound createSound(const std::string& path);
+        std::unique_ptr<MaSound> createSound(const std::string& path);
 
         void play(MaSound& sound);
         void stop(MaSound& sound);

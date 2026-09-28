@@ -3,8 +3,8 @@
 
 AudioEngine::AudioEngine(ma_device_id* pDeviceID) : engine(pDeviceID) {}
 
-MaSound AudioEngine::createSound(const std::string& path) {
-    return MaSound(engine, path);
+std::unique_ptr<MaSound> AudioEngine::createSound(const std::string& path) {
+    return std::make_unique<MaSound>(engine, path);
 }
 
 void AudioEngine::play(MaSound& sound) {
