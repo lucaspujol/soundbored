@@ -49,3 +49,19 @@ std::vector<SoundId> SoundBank::getAllSoundIds() const {
     }
     return ids;
 }
+
+uint64_t SoundBank::getSoundLengthMs(SoundId id) const {
+    auto it = sounds.find(id);
+    if (it != sounds.end()) {
+        return it->second->getLengthMs();
+    }
+    return 0;
+}
+
+uint64_t SoundBank::getSoundRemainingLengthMs(SoundId id) const {
+    auto it = sounds.find(id);
+    if (it != sounds.end()) {
+        return it->second->getRemainingLengthMs();
+    }
+    return 0;
+}

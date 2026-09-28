@@ -83,6 +83,22 @@ void AudioManager::restartSound(SoundId id) {
     if (virtualSoundBank)  virtualSoundBank->restart(id);
 }
 
+uint64_t AudioManager::getSoundLengthMs(SoundId id) const {
+    // ask physical bank, because always set
+    if (!physicalSoundBank || !physicalSoundBank->hasSound(id)) {
+        return 0;
+    }
+    return physicalSoundBank->getSoundLengthMs(id);
+}
+
+uint64_t AudioManager::getSoundRemainingLengthMs(SoundId id) const {
+    // ask physical bank, because always set
+    if (!physicalSoundBank || !physicalSoundBank->hasSound(id)) {
+        return 0;
+    }
+    return physicalSoundBank->getSoundRemainingLengthMs(id);
+}
+
 void AudioManager::refreshDeviceCache() {
     cachedDevices.clear();
     ma_device_info* deviceInfos;

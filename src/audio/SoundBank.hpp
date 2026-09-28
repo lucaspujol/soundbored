@@ -26,6 +26,9 @@ class SoundBank {
         bool hasSound(SoundId id) const;
         std::vector<SoundId> getAllSoundIds() const;
 
+        uint64_t getSoundLengthMs(SoundId id) const;
+        uint64_t getSoundRemainingLengthMs(SoundId id) const;
+
     private:
         AudioEngine& engine;  // non-owning reference (engine owned by AudioManager)
         std::map<SoundId, std::unique_ptr<MaSound>> sounds;

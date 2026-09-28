@@ -73,6 +73,11 @@ class AudioManager {
 
         std::map<SoundId, SoundMeta> getSoundMap() const { return soundMetaMap; }
 
+        // get total length of sound in milliseconds, or 0 if sound not found
+        uint64_t getSoundLengthMs(SoundId id) const;
+        // get remaining length of sound in milliseconds, or 0 if sound not found
+        uint64_t getSoundRemainingLengthMs(SoundId id) const;
+
     private:
         AudioManager();
 
