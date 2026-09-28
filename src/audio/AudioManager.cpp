@@ -47,15 +47,15 @@ void AudioManager::clearVirtualDevice() {
     virtualEngine.reset();
 }
 
-int32_t AudioManager::importSound(std::string path) {
+SoundId AudioManager::importSound(std::string path) {
     SoundId id = nextSoundId;
     if (!physicalSoundBank->loadSound(id, path)) {
-        return -1;
+        return ERROR_SOUND_ID;
     }
     if (virtualSoundBank && !virtualSoundBank->loadSound(id, path)) {
         // Rollback: remove from physical bank to keep state consistent
         physicalSoundBank->unloadSound(id);
-        return -1;
+        return ERROR_SOUND_ID;
     }
 
     soundMetaMap[id] = { path };

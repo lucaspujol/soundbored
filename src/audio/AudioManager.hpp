@@ -60,7 +60,7 @@ class AudioManager {
         bool setVirtualDevice(std::string dName);
         void clearVirtualDevice();
 
-        // returns sound id, or -1 on any failure
+        // returns sound id, or 0 on any failure
         SoundId importSound(std::string path);
         void removeSound(SoundId id);
 
@@ -89,7 +89,6 @@ class AudioManager {
         std::unique_ptr<AudioEngine> virtualEngine;
         std::unique_ptr<SoundBank> virtualSoundBank;
 
-        static const int MIN_SOUND_ID = 0;
         SoundId nextSoundId = MIN_SOUND_ID;
         std::map<SoundId, SoundMeta> soundMetaMap;
 

@@ -8,8 +8,9 @@
 #include <memory>
 #include <cstdint>
 
-// actual ids will be > 0, -1 is used to indicate failure for sound related stuff
-using SoundId = int32_t;
+using SoundId = uint32_t;
+static const SoundId MIN_SOUND_ID = 1;
+static const SoundId ERROR_SOUND_ID = 0;
 
 class SoundBank {
     public:
@@ -17,7 +18,7 @@ class SoundBank {
         ~SoundBank() = default;
         
         bool loadSound(SoundId id, const std::string& path);
-        bool unloadSound(SoundId id); // unload sound and path
+        bool unloadSound(SoundId id);
 
         void play(SoundId id);
         void stop(SoundId id);
