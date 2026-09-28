@@ -48,24 +48,25 @@ void AudioManager::clearVirtualDevice() {
 }
 
 int32_t AudioManager::importSound(std::string path) {
-    if (physicalSoundBank && !physicalSoundBank->loadSound(nextSoundId, path)) {
+    SoundId id = nextSoundId;
+    if (!physicalSoundBank->loadSound(id, path)) {
+        return -1;
+    }
+    if (virtualSoundBank && !virtualSoundBank->loadSound(id, path)) {
+        // Rollback: remove from physical bank to keep state consistent
+        physicalSoundBank->unloadSound(id);
         return -1;
     }
 
-    if (virtualSoundBank && !virtualSoundBank->loadSound(nextSoundId, path)) {
-        return -1;
-    }
-
-    soundMetaMap[nextSoundId] = { path };
-    return nextSoundId++;
+    soundMetaMap[id] = { path };
+    nextSoundId++;
+    return id;
 }
 
 void AudioManager::removeSound(SoundId id) {
     if (physicalSoundBank) physicalSoundBank->unloadSound(id);
     if (virtualSoundBank)  virtualSoundBank->unloadSound(id);
-    if (soundMetaMap.find(id) != soundMetaMap.end()) {
-        soundMetaMap.erase(id);
-    }
+    soundMetaMap.erase(id); // no-op if id not found
 }
 
 void AudioManager::playSound(SoundId id) {
