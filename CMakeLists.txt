@@ -32,6 +32,12 @@ FetchContent_Declare(raylib
     GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(raylib)
 
+# miniaudio (header-only)
+FetchContent_Declare(miniaudio
+    GIT_REPOSITORY https://github.com/mackron/miniaudio.git
+    GIT_TAG 0.11.21)
+FetchContent_MakeAvailable(miniaudio)
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.cpp
     ${CMAKE_SOURCE_DIR}/src/*.c
@@ -45,10 +51,20 @@ target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
                            ${CMAKE_SOURCE_DIR}/src
-                           ${CMAKE_SOURCE_DIR}/vendor/clay/)
+                           ${CMAKE_SOURCE_DIR}/vendor/clay/
+                           ${miniaudio_SOURCE_DIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}
 )
+
+# Link platform libs for miniaudio
+if(UNIX AND NOT APPLE)
+    target_link_libraries(${PROJECT_NAME} PRIVATE pthread m dl)
+endif()
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm ole32)
+endif()
