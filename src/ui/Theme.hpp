@@ -29,30 +29,31 @@ namespace theme {
 
     inline constexpr Clay_Color transparent = { 0, 0, 0, 0 };
 
+    // font faces. Each face is loaded at a pixel size the first time that size is used (see FontCache)
     namespace font {
-        inline constexpr uint16_t display_semibold = 0;     // headings
-        inline constexpr uint16_t display_bold     = 1;     // logo
-        inline constexpr uint16_t sans_regular     = 2;     // body
-        inline constexpr uint16_t sans_medium      = 3;     // ui
-        inline constexpr uint16_t sans_semibold    = 4;     // ui emphasis
-        inline constexpr uint16_t mono_medium      = 5;     // key chips, times, percentages
+        enum Face : uint16_t {
+            display_semibold,   // headings
+            display_bold,       // logo
+            sans_regular,       // body
+            sans_medium,        // ui
+            sans_semibold,      // ui emphasis
+            mono_medium,        // key chips, times, percentages
+            face_count,
+        };
     }
 
-    // icon ids: index into UI::icons
+    // icon ids: index into Icons
     namespace icon {
-        inline constexpr uint16_t upload = 0;
-        inline constexpr uint16_t stop   = 1;
+        enum Id : uint16_t {
+            upload,
+            stop,
+            icon_count,
+        };
     }
 
     inline constexpr Clay_Sizing expand = {
         .width = CLAY_SIZING_GROW(0),
         .height = CLAY_SIZING_GROW(0),
-    };
-
-    inline constexpr Clay_TextElementConfig bodyText {
-        .textColor = text_primary,
-        .fontId = font::sans_regular,
-        .fontSize = 20,
     };
 
     // layout constants
