@@ -71,6 +71,8 @@ class AudioManager {
         // plays a sound from the beginning on the physical device and the virtual device if set
         void restartSound(SoundId id);
 
+        std::map<SoundId, SoundMeta> getSoundMap() const { return soundMetaMap; }
+
     private:
         AudioManager();
 
