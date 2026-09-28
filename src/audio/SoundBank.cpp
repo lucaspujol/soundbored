@@ -1,5 +1,4 @@
 #include "SoundBank.hpp"
-#include <vector>
 
 SoundBank::SoundBank(AudioEngine& engine) : engine(engine) {}
 
@@ -66,18 +65,6 @@ std::string SoundBank::getSoundPath(SoundId id) const {
     return "";
 }
 
-std::vector<SoundId> SoundBank::getAllSoundIds() const {
-    std::vector<SoundId> ids;
-    for (const auto& pair : sounds) {
-        ids.push_back(pair.first);
-    }
-    return ids;
-}
-
-std::vector<std::string> SoundBank::getAllSoundPaths() const {
-    std::vector<std::string> pathsList;
-    for (const auto& pair : paths) {
-        pathsList.push_back(pair.second);
-    }
-    return pathsList;
+std::map<SoundId, std::string> SoundBank::getSoundMap() const {
+    return paths;
 }

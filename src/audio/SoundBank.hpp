@@ -4,7 +4,6 @@
 
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <map>
 #include <memory>
 
@@ -25,8 +24,7 @@ class SoundBank {
         bool hasSound(SoundId id) const;
         bool hasSound(std::string path) const;
         std::string getSoundPath(SoundId id) const;
-        std::vector<SoundId> getAllSoundIds() const;
-        std::vector<std::string> getAllSoundPaths() const;
+        std::map<SoundId, std::string> getSoundMap() const;
 
     private:
         AudioEngine& engine;  // non-owning reference (engine owned by AudioManager)
