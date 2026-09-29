@@ -36,12 +36,6 @@ struct DeviceInfo {
     bool isDefault;
 };
 
-struct SoundMeta {
-    std::string path;
-    // later can add volume, keybind, etc
-};
-
-
 class AudioManager {
     public:
         static AudioManager& getInstance() {
@@ -71,7 +65,7 @@ class AudioManager {
         // plays a sound from the beginning on the physical device and the virtual device if set
         void restartSound(SoundId id);
 
-        std::map<SoundId, SoundMeta> getSoundMap() const { return soundMetaMap; }
+        std::map<SoundId, std::string> getSoundMap() const { return soundPaths; }
 
         // get total length of sound in milliseconds, or 0 if sound not found
         uint64_t getSoundLengthMs(SoundId id) const;
@@ -90,7 +84,7 @@ class AudioManager {
         std::unique_ptr<SoundBank> virtualSoundBank;
 
         SoundId nextSoundId = MIN_SOUND_ID;
-        std::map<SoundId, SoundMeta> soundMetaMap;
+        std::map<SoundId, std::string> soundPaths;
 
         std::vector<DeviceInfo> cachedDevices;
 

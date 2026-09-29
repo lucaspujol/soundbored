@@ -2,7 +2,7 @@
 
 #include "data/Types.hpp"
 
-#include <filesystem>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -11,8 +11,8 @@
 struct SoundData {
     SoundId id;
     std::string name;
-    std::filesystem::path path;
-    uint32_t durationMs;
+    std::string path;
+    uint64_t durationMs;
     float volume;
     std::optional<Keybind> keybind;
     // add color/tint, but could be tied to a board. we can imagine user picks a color for his board(s)
@@ -42,7 +42,7 @@ struct Settings {
 
 struct Playback {
     std::optional<SoundId> currentlyPlaying;
-    uint32_t positionMs;
+    uint64_t positionMs;
 };
 
 struct AppState {

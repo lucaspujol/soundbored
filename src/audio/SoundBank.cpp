@@ -5,7 +5,11 @@ SoundBank::SoundBank(AudioEngine& engine) : engine(engine) {}
 bool SoundBank::loadSound(SoundId id, const std::string& path) {
     if (sounds.find(id) != sounds.end()) return false;
 
-    sounds[id] = engine.createSound(path);
+    try {
+        sounds[id] = engine.createSound(path);
+    } catch (const std::runtime_error&) {
+        return false;
+    }
     return true;
 }
 
