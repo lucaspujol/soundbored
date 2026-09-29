@@ -35,8 +35,16 @@ FetchContent_MakeAvailable(raylib)
 # miniaudio (header-only)
 FetchContent_Declare(miniaudio
     GIT_REPOSITORY https://github.com/mackron/miniaudio.git
-    GIT_TAG 0.11.21)
+    GIT_TAG 0.11.21
+    GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(miniaudio)
+
+# cord (header-only)
+FetchContent_Declare(cord
+    GIT_REPOSITORY https://github.com/louisbgl/cord-cpp.git
+    GIT_TAG main
+    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(cord)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.cpp
@@ -48,6 +56,7 @@ add_executable(${PROJECT_NAME}
                ${CMAKE_SOURCE_DIR}/vendor/clay/clay_renderer_raylib.c)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_link_libraries(${PROJECT_NAME} PRIVATE cord)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
                            ${CMAKE_SOURCE_DIR}/src

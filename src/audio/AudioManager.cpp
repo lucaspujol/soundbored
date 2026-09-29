@@ -131,6 +131,7 @@ ma_device_id AudioManager::getDefaultDeviceId() {
 }
 
 bool AudioManager::resolveDeviceName(std::string dName, ma_device_id* outId) {
+    refreshDeviceCache();
     for (const auto& device : cachedDevices) {
         if (device.name == dName) {
             *outId = device.id;
