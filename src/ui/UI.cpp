@@ -5,8 +5,10 @@
 #include "ui/UI.hpp"
 #include "ui/FontCache.hpp"
 #include "ui/sections/Header.hpp"
+#include "ui/sections/Sidebar.hpp"
 #include "ui/Icons.hpp"
-#include "ui/Theme.hpp"
+#include "ui/theme/Colors.hpp"
+#include "ui/theme/Layout.hpp"
 
 #include <cstdio>
 #include <filesystem>
@@ -62,7 +64,7 @@ std::vector<Action> UI::frame(const AppState &appState) {
 
     // layout computing
     Clay_BeginLayout();
-    buildLayout(actions);      // internal function to our UI class
+    buildLayout(appState, actions);      // internal function to our UI class
     Clay_RenderCommandArray commandArray = Clay_EndLayout(GetFrameTime());
 
     // raylib rendering
@@ -73,7 +75,7 @@ std::vector<Action> UI::frame(const AppState &appState) {
     return actions;
 }
 
-void UI::buildLayout(std::vector<Action> &actions) {
+void UI::buildLayout(const AppState &appState, std::vector<Action> &actions) {
     CLAY(CLAY_ID("root"), Clay_ElementDeclaration {
         .layout = {
             .sizing = theme::expand,
@@ -92,25 +94,8 @@ void UI::buildLayout(std::vector<Action> &actions) {
             },
             .backgroundColor = theme::background,
         }) {
-            CLAY(CLAY_ID("sidebar"), Clay_ElementDeclaration{
-                .layout = {
-                    .sizing = {
-                        CLAY_SIZING_FIXED(theme::sidebar_width_px),
-                        CLAY_SIZING_GROW(0),
-                    },
-                    .padding = CLAY_PADDING_ALL(24),
-                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
-                },
-                .backgroundColor = theme::panel,
-                .border = {
-                    .color = theme::strong_sep,
-                    .width = { .right = 1 },
-                }
-            }) {
-                Clay_TextElementConfig label = fonts->text(theme::font::Face::sans_semibold, 20, theme::text_tertiary);
-                label.letterSpacing = 2;
-                CLAY_TEXT(CLAY_STRING("OUTPUT"), label);
-            }
+            SidebarActions sidebar = Sidebar(*fonts, *icons, appState, selectedBoard);
+            if (sidebar.boardClicked) { selectedBoard = *sidebar.boardClicked; }
             CLAY(CLAY_ID("contentArea"), Clay_ElementDeclaration{
                 .layout = {
                     .sizing = theme::expand,
