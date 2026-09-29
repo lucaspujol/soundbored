@@ -76,4 +76,6 @@ endif()
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE winmm ole32)
+    # UTF-8 process codepage, so narrow file APIs (fopen) accept UTF-8 paths
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/resources/soundbored.manifest)
 endif()
