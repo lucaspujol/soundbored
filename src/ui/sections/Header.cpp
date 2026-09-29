@@ -1,5 +1,5 @@
-#include "ui/Header.hpp"
-#include "ui/Button.hpp"
+#include "ui/sections/Header.hpp"
+#include "ui/components/Button.hpp"
 #include "ui/FontCache.hpp"
 #include "ui/Icons.hpp"
 #include "ui/Theme.hpp"
@@ -16,8 +16,8 @@ namespace {
                 .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
             },
         }) {
-            CLAY_TEXT(CLAY_STRING("sound"), fonts.text(theme::font::display_bold, 42, theme::text_primary));
-            CLAY_TEXT(CLAY_STRING("bored"), fonts.text(theme::font::display_bold, 42, theme::orange));
+            CLAY_TEXT(CLAY_STRING("sound"), fonts.text(theme::font::Face::display_bold, 42, theme::text_primary));
+            CLAY_TEXT(CLAY_STRING("bored"), fonts.text(theme::font::Face::display_bold, 42, theme::orange));
         }
     }
 
@@ -38,7 +38,7 @@ namespace {
             // TODO
             CLAY_TEXT(
                 CLAY_STRING("Search bar placeholder"),
-                fonts.text(theme::font::sans_regular, 20, theme::text_primary)
+                fonts.text(theme::font::Face::sans_regular, 20, theme::text_primary)
             );
         }
     }

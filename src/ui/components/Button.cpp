@@ -1,4 +1,4 @@
-#include "ui/Button.hpp"
+#include "ui/components/Button.hpp"
 #include "ui/FontCache.hpp"
 #include "ui/Theme.hpp"
 
@@ -30,7 +30,7 @@ bool Button(FontCache &fonts, Clay_String label, Texture2D *icon, const theme::B
         if (icon) {
             ButtonIcon(icon, style.content);
         }
-        CLAY_TEXT(label, fonts.text(theme::font::sans_semibold, 24, style.content));
+        CLAY_TEXT(label, fonts.text(theme::font::Face::sans_semibold, 24, style.content));
     }
     return clicked;
 }
