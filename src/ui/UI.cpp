@@ -1,4 +1,3 @@
-#include "data/AppState.hpp"
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
 #include "clay_renderer_raylib.h"
@@ -8,7 +7,6 @@
 #include "ui/Header.hpp"
 #include "ui/Icons.hpp"
 #include "ui/Theme.hpp"
-#include "data/Actions.hpp"
 
 #include <cstdio>
 #include <filesystem>
