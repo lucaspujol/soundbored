@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AudioEngine.hpp"
+#include "data/Types.hpp"
 
 #include <map>
 #include <string>
@@ -8,7 +9,6 @@
 #include <memory>
 #include <cstdint>
 
-using SoundId = uint32_t;
 static const SoundId MIN_SOUND_ID = 1;
 static const SoundId ERROR_SOUND_ID = 0;
 
