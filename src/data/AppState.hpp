@@ -11,7 +11,7 @@
 struct SoundData {
     SoundId id;
     std::string name;
-    std::filesystem::path path;
+    std::string path;
     uint32_t durationMs;
     float volume;
     std::optional<Keybind> keybind;
