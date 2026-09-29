@@ -1,3 +1,4 @@
+#include "data/AppState.hpp"
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
 #include "clay_renderer_raylib.h"
@@ -7,10 +8,10 @@
 #include "ui/Header.hpp"
 #include "ui/Icons.hpp"
 #include "ui/Theme.hpp"
+#include "data/Actions.hpp"
 
 #include <cstdio>
 #include <filesystem>
-#include <iostream>
 
 namespace {
 
@@ -49,7 +50,8 @@ bool UI::shouldClose() const {
     return WindowShouldClose();
 }
 
-void UI::frame() {
+std::vector<Action> UI::frame(const AppState &appState) {
+    std::vector<Action> actions;
     // clay setup
     Clay_SetLayoutDimensions({ (float)GetScreenWidth(), (float)GetScreenHeight() });
     Vector2 mouse = GetMousePosition();
@@ -62,7 +64,7 @@ void UI::frame() {
 
     // layout computing
     Clay_BeginLayout();
-    buildLayout();      // internal function to our UI class
+    buildLayout(actions);      // internal function to our UI class
     Clay_RenderCommandArray commandArray = Clay_EndLayout(GetFrameTime());
 
     // raylib rendering
@@ -70,9 +72,10 @@ void UI::frame() {
     ClearBackground(BLACK);
     Clay_Raylib_Render(commandArray, fonts->data());
     EndDrawing();
+    return actions;
 }
 
-void UI::buildLayout() {
+void UI::buildLayout(std::vector<Action> &actions) {
     CLAY(CLAY_ID("root"), Clay_ElementDeclaration {
         .layout = {
             .sizing = theme::expand,
@@ -81,8 +84,8 @@ void UI::buildLayout() {
         .backgroundColor = theme::background,
     }) {
         HeaderActions header = Header(*fonts, *icons);
-        if (header.importClicked)  { std::cout << "Import button clicked" << std::endl; }
-        if (header.stopAllClicked) { std::cout << "Stop all button clicked" << std::endl; }
+        if (header.importClicked)  { actions.push_back(action::ImportFiles{}); }
+        if (header.stopAllClicked) { actions.push_back(action::StopAll{}); }
 
         CLAY(CLAY_ID("mainContent"), Clay_ElementDeclaration{
             .layout = {

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <vector>
+
+#include "data/Actions.hpp"
+#include "data/AppState.hpp"
 
 class FontCache;
 class Icons;
@@ -14,10 +18,10 @@ public:
     UI& operator=(const UI&) = delete;
 
     bool shouldClose() const;
-    void frame();
+    std::vector<Action> frame(const AppState &appState);
 
 private:
-    void buildLayout();
+    void buildLayout(std::vector<Action> &actions);
 
     std::unique_ptr<char[]> clayMemory;
     std::unique_ptr<FontCache> fonts;
