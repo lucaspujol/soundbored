@@ -76,3 +76,7 @@ notes/
 
 # config files
 soundbored.conf
+
+# testing sounds
+*.mp3
+*.wav
