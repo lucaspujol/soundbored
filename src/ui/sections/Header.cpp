@@ -2,7 +2,9 @@
 #include "ui/components/Button.hpp"
 #include "ui/FontCache.hpp"
 #include "ui/Icons.hpp"
-#include "ui/Theme.hpp"
+#include "ui/ClayHelpers.hpp"
+#include "ui/components/Icon.hpp"
+#include "ui/theme/Layout.hpp"
 
 namespace {
     void Logo(FontCache &fonts) {
@@ -42,15 +44,11 @@ namespace {
             );
         }
     }
-
-    void Spacer() {
-        CLAY(CLAY_ID("spacer"), { .layout = { .sizing = { CLAY_SIZING_GROW(0) } } }) {}
-    }
 }
 
 HeaderActions Header(FontCache &fonts, Icons &icons) {
     HeaderActions actions;
-    
+
     CLAY(CLAY_ID("header"), Clay_ElementDeclaration{
         .layout = {
             .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_FIXED(theme::header_size_px), },
@@ -73,8 +71,14 @@ HeaderActions Header(FontCache &fonts, Icons &icons) {
                 .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
             },
         }) {
-            actions.importClicked  = Button(fonts, CLAY_STRING("Import"),   icons.get(theme::icon::upload), theme::secondaryButton);
-            actions.stopAllClicked = Button(fonts, CLAY_STRING("Stop all"), icons.get(theme::icon::stop),   theme::dangerButton);
+            actions.importClicked = Button(CLAY_ID("importButton"), theme::secondaryButton, [&] {
+                Icon(icons.get(theme::icon::upload), theme::secondaryButton.content);
+                CLAY_TEXT(CLAY_STRING("Import"), fonts.text(theme::font::Face::sans_semibold, 24, theme::secondaryButton.content));
+            });
+            actions.stopAllClicked = Button(CLAY_ID("stopAllButton"), theme::dangerButton, [&] {
+                Icon(icons.get(theme::icon::stop), theme::dangerButton.content);
+                CLAY_TEXT(CLAY_STRING("Stop all"), fonts.text(theme::font::Face::sans_semibold, 24, theme::dangerButton.content));
+            });
         }
     }
     return actions;
