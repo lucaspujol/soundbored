@@ -31,7 +31,7 @@ namespace theme {
 
     // font faces. Each face is loaded at a pixel size the first time that size is used (see FontCache)
     namespace font {
-        enum Face : uint16_t {
+        enum class Face : uint16_t {
             display_semibold,   // headings
             display_bold,       // logo
             sans_regular,       // body
