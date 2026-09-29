@@ -2,7 +2,6 @@
 
 #include "data/Types.hpp"
 
-#include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
