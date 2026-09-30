@@ -62,9 +62,12 @@ std::vector<Action> UI::frame(const AppState &appState) {
         Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
     }
 
+    // last frame's strings are rendered already
+    text.clear();
+
     // layout computing
     Clay_BeginLayout();
-    buildLayout(appState, actions);      // internal function to our UI class
+    buildLayout(appState, actions, text);      // internal function to our UI class
     Clay_RenderCommandArray commandArray = Clay_EndLayout(GetFrameTime());
 
     // raylib rendering
@@ -75,7 +78,7 @@ std::vector<Action> UI::frame(const AppState &appState) {
     return actions;
 }
 
-void UI::buildLayout(const AppState &appState, std::vector<Action> &actions) {
+void UI::buildLayout(const AppState &appState, std::vector<Action> &actions, TextArena &text) {
     CLAY(CLAY_ID("root"), Clay_ElementDeclaration {
         .layout = {
             .sizing = theme::expand,
@@ -94,7 +97,7 @@ void UI::buildLayout(const AppState &appState, std::vector<Action> &actions) {
             },
             .backgroundColor = theme::background,
         }) {
-            SidebarActions sidebar = Sidebar(*fonts, *icons, appState, selectedBoard);
+            SidebarActions sidebar = Sidebar(*fonts, *icons, text, appState, selectedBoard);
             if (sidebar.boardClicked) { selectedBoard = *sidebar.boardClicked; }
             CLAY(CLAY_ID("contentArea"), Clay_ElementDeclaration{
                 .layout = {
