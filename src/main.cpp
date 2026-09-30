@@ -1,4 +1,5 @@
 #include "audio/AudioManager.hpp"
+#include "data/Actions.hpp"
 #include "data/AppState.hpp"
 #include "StubState.hpp"
 #include "ui/UI.hpp"
