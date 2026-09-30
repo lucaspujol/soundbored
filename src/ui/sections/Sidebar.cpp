@@ -1,8 +1,10 @@
 #include "ui/sections/Sidebar.hpp"
 #include "ui/ClayHelpers.hpp"
 #include "ui/FontCache.hpp"
+#include "ui/TextArena.hpp"
 #include "ui/components/Button.hpp"
 #include "ui/components/Icon.hpp"
+#include "ui/components/Slider.hpp"
 #include "ui/theme/Colors.hpp"
 #include "ui/theme/Layout.hpp"
 
@@ -24,7 +26,7 @@ namespace {
     const OutputLook monitorLook { CLAY_STRING("Monitor"), CLAY_STRING("what you hear"),  theme::icon::headphones, theme::orange };
     const OutputLook micLook     { CLAY_STRING("Mic out"), CLAY_STRING("what they hear"), theme::icon::mic, theme::blue };
 
-    void OutputSection(const OutputLook &look, const Output &output, FontCache &fonts, Icons &icons) {
+    void OutputSection(const OutputLook &look, const Output &output, FontCache &fonts, Icons &icons, TextArena &text) {
         CLAY(CLAY_SID(look.name), Clay_ElementDeclaration{
             .layout = {
                 .sizing = { CLAY_SIZING_GROW(0) },
@@ -51,16 +53,35 @@ namespace {
                 Spacer();
                 Icon(icons.get(theme::icon::chevron_down), theme::text_secondary);
             }, { .width = CLAY_SIZING_GROW(0) });
-            // TODO: volume slider (output.volume)
-            
+
+            CLAY(CLAY_ID_LOCAL("volumeRow"), Clay_ElementDeclaration{
+                .layout = {
+                    .sizing = { CLAY_SIZING_GROW(0) },
+                    .padding = { .top = 6, .bottom = 6 },
+                    .childGap = 12,
+                    .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
+                    .layoutDirection = CLAY_LEFT_TO_RIGHT,
+                },
+            }) {
+                Clay_TextElementConfig hintText = fonts.text(theme::font::Face::sans_medium, 18, theme::text_tertiary);
+                CLAY_TEXT(CLAY_STRING("Vol"), hintText);
+                theme::SliderStyle s = theme::slider;
+                s.fill = look.accent;
+                if (auto v = Slider(CLAY_ID_LOCAL("volume"), output.volume, s, { .width = CLAY_SIZING_GROW(0) })) {
+                    // TODO: change state
+    
+                }
+                auto percent = static_cast<int>(output.volume * 100);
+                CLAY_TEXT(text.keep(std::to_string(percent) + "%"), hintText);
+            }
         }
     }
 
-    void OutputBlock(FontCache &fonts, Icons &icons, const Settings &settings) {
+    void OutputBlock(FontCache &fonts, Icons &icons, TextArena &text, const Settings &settings) {
         SectionLabel(fonts, CLAY_STRING("OUTPUT"));
-        OutputSection(monitorLook, settings.physicalOut, fonts, icons);
+        OutputSection(monitorLook, settings.physicalOut, fonts, icons, text);
         if (settings.virtualOut) {
-            OutputSection(micLook, *settings.virtualOut, fonts, icons);
+            OutputSection(micLook, *settings.virtualOut, fonts, icons, text);
         }
     }
 
@@ -104,7 +125,7 @@ namespace {
     }
 }
 
-SidebarActions Sidebar(FontCache &fonts, Icons &icons, const AppState &state, BoardId selectedBoard) {
+SidebarActions Sidebar(FontCache &fonts, Icons &icons, TextArena &text, const AppState &state, BoardId selectedBoard) {
     SidebarActions actions;
 
     CLAY(CLAY_ID("sidebar"), Clay_ElementDeclaration{
@@ -123,7 +144,7 @@ SidebarActions Sidebar(FontCache &fonts, Icons &icons, const AppState &state, Bo
             .width = { .right = 1 },
         }
     }) {
-        OutputBlock(fonts, icons, state.settings);
+        OutputBlock(fonts, icons, text, state.settings);
         RetriggerBlock(fonts, state.settings.retrigger);
         actions.boardClicked = BoardList(fonts, state.library.boards, selectedBoard);
         // TODO: spacer + "Global hotkeys active" status at the bottom
