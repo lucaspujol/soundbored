@@ -16,6 +16,7 @@ inline Clay_String ToClay(const std::string &s) {
     return { .isStaticallyAllocated = false, .length = static_cast<int32_t>(s.size()), .chars = s.c_str() };
 }
 
+// grows on both axes, so it pushes siblings apart in rows and columns
 inline void Spacer() {
-    CLAY_AUTO_ID({ .layout = { .sizing = { CLAY_SIZING_GROW(0) } } }) {}
+    CLAY_AUTO_ID({ .layout = { .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0) } } }) {}
 }
