@@ -5,6 +5,8 @@
 
 #include "data/Actions.hpp"
 #include "data/AppState.hpp"
+#include "ui/FrameData.hpp"
+#include "ui/TextArena.hpp"
 
 class FontCache;
 class Icons;
@@ -21,7 +23,12 @@ public:
     std::vector<Action> frame(const AppState &appState);
 
 private:
-    void buildLayout(std::vector<Action> &actions);
+    void buildLayout(FrameData &f);
+
+    UiState ui;
+
+    // per-frame strings, cleared at the start of frame()
+    TextArena text;
 
     std::unique_ptr<char[]> clayMemory;
     std::unique_ptr<FontCache> fonts;

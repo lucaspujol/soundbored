@@ -1,12 +1,15 @@
+#include "raylib.h"
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
 #include "clay_renderer_raylib.h"
 
 #include "ui/UI.hpp"
 #include "ui/FontCache.hpp"
-#include "ui/Header.hpp"
+#include "ui/sections/Header.hpp"
+#include "ui/sections/Sidebar.hpp"
 #include "ui/Icons.hpp"
-#include "ui/Theme.hpp"
+#include "ui/theme/Colors.hpp"
+#include "ui/theme/Layout.hpp"
 
 #include <cstdio>
 #include <filesystem>
@@ -59,10 +62,17 @@ std::vector<Action> UI::frame(const AppState &appState) {
     if (IsKeyPressed(KEY_D)) {
         Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
     }
+    if (IsKeyPressed(KEY_F1)) {
+        actions.push_back(action::ToggleHotkeys{});
+    }
+
+    // last frame's strings are rendered already
+    text.clear();
 
     // layout computing
     Clay_BeginLayout();
-    buildLayout(actions);      // internal function to our UI class
+    FrameData f { appState, ui, actions, *fonts, *icons, text };
+    buildLayout(f);      // internal function to our UI class
     Clay_RenderCommandArray commandArray = Clay_EndLayout(GetFrameTime());
 
     // raylib rendering
@@ -73,7 +83,7 @@ std::vector<Action> UI::frame(const AppState &appState) {
     return actions;
 }
 
-void UI::buildLayout(std::vector<Action> &actions) {
+void UI::buildLayout(FrameData &frameData) {
     CLAY(CLAY_ID("root"), Clay_ElementDeclaration {
         .layout = {
             .sizing = theme::expand,
@@ -81,9 +91,7 @@ void UI::buildLayout(std::vector<Action> &actions) {
         },
         .backgroundColor = theme::background,
     }) {
-        HeaderActions header = Header(*fonts, *icons);
-        if (header.importClicked)  { actions.push_back(action::ImportFiles{}); }
-        if (header.stopAllClicked) { actions.push_back(action::StopAll{}); }
+        Header(frameData);
 
         CLAY(CLAY_ID("mainContent"), Clay_ElementDeclaration{
             .layout = {
@@ -92,20 +100,7 @@ void UI::buildLayout(std::vector<Action> &actions) {
             },
             .backgroundColor = theme::background,
         }) {
-            CLAY(CLAY_ID("sidebar"), Clay_ElementDeclaration{
-                .layout = {
-                    .sizing = {
-                        CLAY_SIZING_FIXED(theme::sidebar_width_px),
-                        CLAY_SIZING_GROW(0),
-                    },
-                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
-                },
-                .backgroundColor = theme::panel,
-                .border = {
-                    .color = theme::strong_sep,
-                    .width = { .right = 1 },
-                }
-            }) {}
+            Sidebar(frameData);
             CLAY(CLAY_ID("contentArea"), Clay_ElementDeclaration{
                 .layout = {
                     .sizing = theme::expand,

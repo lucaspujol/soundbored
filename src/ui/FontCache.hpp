@@ -7,7 +7,7 @@
 
 #include "clay.h"
 #include "raylib.h"
-#include "ui/Theme.hpp"
+#include "ui/theme/Fonts.hpp"
 
 class FontCache {
 public:
