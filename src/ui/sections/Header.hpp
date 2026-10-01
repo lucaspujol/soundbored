@@ -1,11 +1,6 @@
 #pragma once
 
-class FontCache;
-class Icons;
+struct FrameData;
 
-struct HeaderActions {
-    bool importClicked  = false;
-    bool stopAllClicked = false;
-};
-
-HeaderActions Header(FontCache &fonts, Icons &icons);
+// pushes ImportFiles / StopAll into f.actions when clicked
+void Header(FrameData &f);

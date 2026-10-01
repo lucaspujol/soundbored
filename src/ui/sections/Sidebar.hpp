@@ -1,16 +1,6 @@
 #pragma once
 
-#include "data/AppState.hpp"
-#include "ui/TextArena.hpp"
-#include "ui/Icons.hpp"
+struct FrameData;
 
-#include <optional>
-
-class FontCache;
-
-struct SidebarActions {
-    std::optional<BoardId> boardClicked;
-
-};
-
-SidebarActions Sidebar(FontCache &fonts, Icons &icons, TextArena &text, const AppState &state, BoardId selectedBoard);
+// sets frameData.ui.selectedBoard when a board is clicked
+void Sidebar(FrameData &frameData);

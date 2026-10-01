@@ -5,6 +5,7 @@
 
 #include "data/Actions.hpp"
 #include "data/AppState.hpp"
+#include "ui/FrameData.hpp"
 #include "ui/TextArena.hpp"
 
 class FontCache;
@@ -22,10 +23,9 @@ public:
     std::vector<Action> frame(const AppState &appState);
 
 private:
-    void buildLayout(const AppState &appState, std::vector<Action> &actions, TextArena &text);
+    void buildLayout(FrameData &f);
 
-    // UI-only state: not saved, audio doesn't care
-    BoardId selectedBoard = 0;
+    UiState ui;
 
     // per-frame strings, cleared at the start of frame()
     TextArena text;

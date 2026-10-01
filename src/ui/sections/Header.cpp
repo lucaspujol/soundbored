@@ -1,4 +1,5 @@
 #include "ui/sections/Header.hpp"
+#include "ui/FrameData.hpp"
 #include "ui/components/Button.hpp"
 #include "ui/FontCache.hpp"
 #include "ui/Icons.hpp"
@@ -7,7 +8,7 @@
 #include "ui/theme/Layout.hpp"
 
 namespace {
-    void Logo(FontCache &fonts) {
+    void Logo(FrameData &f) {
         CLAY(CLAY_ID("logo"), Clay_ElementDeclaration{
             .layout = {
                 .sizing = {
@@ -18,12 +19,12 @@ namespace {
                 .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
             },
         }) {
-            CLAY_TEXT(CLAY_STRING("sound"), fonts.text(theme::font::Face::display_bold, 42, theme::text_primary));
-            CLAY_TEXT(CLAY_STRING("bored"), fonts.text(theme::font::Face::display_bold, 42, theme::orange));
+            CLAY_TEXT(CLAY_STRING("sound"), f.fonts.text(theme::font::Face::display_bold, 42, theme::text_primary));
+            CLAY_TEXT(CLAY_STRING("bored"), f.fonts.text(theme::font::Face::display_bold, 42, theme::orange));
         }
     }
 
-    void SearchBar(FontCache &fonts) {
+    void SearchBar(FrameData &f) {
         CLAY(CLAY_ID("searchBar"), Clay_ElementDeclaration{
             .layout = {
                 .sizing = {
@@ -40,15 +41,13 @@ namespace {
             // TODO
             CLAY_TEXT(
                 CLAY_STRING("Search bar placeholder"),
-                fonts.text(theme::font::Face::sans_regular, 20, theme::text_primary)
+                f.fonts.text(theme::font::Face::sans_regular, 20, theme::text_primary)
             );
         }
     }
 }
 
-HeaderActions Header(FontCache &fonts, Icons &icons) {
-    HeaderActions actions;
-
+void Header(FrameData &f) {
     CLAY(CLAY_ID("header"), Clay_ElementDeclaration{
         .layout = {
             .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_FIXED(theme::header_size_px), },
@@ -60,8 +59,8 @@ HeaderActions Header(FontCache &fonts, Icons &icons) {
             .width = { .bottom = 1 },
         }
     }) {
-        Logo(fonts);
-        SearchBar(fonts);
+        Logo(f);
+        SearchBar(f);
         Spacer();
         CLAY(CLAY_ID("headerButtons"), Clay_ElementDeclaration{
             .layout = {
@@ -71,15 +70,18 @@ HeaderActions Header(FontCache &fonts, Icons &icons) {
                 .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
             },
         }) {
-            actions.importClicked = Button(CLAY_ID("importButton"), theme::secondaryButton, [&] {
-                Icon(icons.get(theme::icon::upload), theme::secondaryButton.content);
-                CLAY_TEXT(CLAY_STRING("Import"), fonts.text(theme::font::Face::sans_semibold, 24, theme::secondaryButton.content));
-            });
-            actions.stopAllClicked = Button(CLAY_ID("stopAllButton"), theme::dangerButton, [&] {
-                Icon(icons.get(theme::icon::stop), theme::dangerButton.content);
-                CLAY_TEXT(CLAY_STRING("Stop all"), fonts.text(theme::font::Face::sans_semibold, 24, theme::dangerButton.content));
-            });
+            if (Button(CLAY_ID("importButton"), theme::secondaryButton, [&] {
+                Icon(f.icons.get(theme::icon::upload), theme::secondaryButton.content);
+                CLAY_TEXT(CLAY_STRING("Import"), f.fonts.text(theme::font::Face::sans_semibold, 24, theme::secondaryButton.content));
+            })) {
+                f.actions.push_back(action::ImportFiles{});
+            }
+            if (Button(CLAY_ID("stopAllButton"), theme::dangerButton, [&] {
+                Icon(f.icons.get(theme::icon::stop), theme::dangerButton.content);
+                CLAY_TEXT(CLAY_STRING("Stop all"), f.fonts.text(theme::font::Face::sans_semibold, 24, theme::dangerButton.content));
+            })) {
+                f.actions.push_back(action::StopAll{});
+            }
         }
     }
-    return actions;
 }

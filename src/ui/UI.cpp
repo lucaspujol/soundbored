@@ -1,3 +1,4 @@
+#include "raylib.h"
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
 #include "clay_renderer_raylib.h"
@@ -61,13 +62,17 @@ std::vector<Action> UI::frame(const AppState &appState) {
     if (IsKeyPressed(KEY_D)) {
         Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
     }
+    if (IsKeyPressed(KEY_F1)) {
+        actions.push_back(action::ToggleHotkeys{});
+    }
 
     // last frame's strings are rendered already
     text.clear();
 
     // layout computing
     Clay_BeginLayout();
-    buildLayout(appState, actions, text);      // internal function to our UI class
+    FrameData f { appState, ui, actions, *fonts, *icons, text };
+    buildLayout(f);      // internal function to our UI class
     Clay_RenderCommandArray commandArray = Clay_EndLayout(GetFrameTime());
 
     // raylib rendering
@@ -78,7 +83,7 @@ std::vector<Action> UI::frame(const AppState &appState) {
     return actions;
 }
 
-void UI::buildLayout(const AppState &appState, std::vector<Action> &actions, TextArena &text) {
+void UI::buildLayout(FrameData &frameData) {
     CLAY(CLAY_ID("root"), Clay_ElementDeclaration {
         .layout = {
             .sizing = theme::expand,
@@ -86,9 +91,7 @@ void UI::buildLayout(const AppState &appState, std::vector<Action> &actions, Tex
         },
         .backgroundColor = theme::background,
     }) {
-        HeaderActions header = Header(*fonts, *icons);
-        if (header.importClicked)  { actions.push_back(action::ImportFiles{}); }
-        if (header.stopAllClicked) { actions.push_back(action::StopAll{}); }
+        Header(frameData);
 
         CLAY(CLAY_ID("mainContent"), Clay_ElementDeclaration{
             .layout = {
@@ -97,8 +100,7 @@ void UI::buildLayout(const AppState &appState, std::vector<Action> &actions, Tex
             },
             .backgroundColor = theme::background,
         }) {
-            SidebarActions sidebar = Sidebar(*fonts, *icons, text, appState, selectedBoard);
-            if (sidebar.boardClicked) { selectedBoard = *sidebar.boardClicked; }
+            Sidebar(frameData);
             CLAY(CLAY_ID("contentArea"), Clay_ElementDeclaration{
                 .layout = {
                     .sizing = theme::expand,
