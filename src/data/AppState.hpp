@@ -38,6 +38,7 @@ struct Settings {
     Output physicalOut;
     std::optional<Output> virtualOut;
     RetriggerMode retrigger;
+    bool hotkeysActive = true;
 };
 
 struct Playback {
