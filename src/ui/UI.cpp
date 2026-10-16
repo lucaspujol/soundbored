@@ -58,10 +58,16 @@ std::vector<Action> UI::frame(const AppState &appState) {
     Vector2 mouse = GetMousePosition();
     Clay_SetPointerState({ mouse.x, mouse.y }, IsMouseButtonDown(MOUSE_BUTTON_LEFT));
 
-    // debug panel
-    if (IsKeyPressed(KEY_D)) {
-        Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
-    }
+    // SmoothScroll moves the position, not clay itself, so we pass { 0, 0 }. Clay still clamps and drops stale containers
+    Clay_UpdateScrollContainers(false, { 0, 0 }, GetFrameTime());
+
+    // hardcoded for now, i know.
+    // the only components that will be scrollable (hence, smooth-scrollable) are the sidebar
+    // and the main content area (sound grid). do i really need perfect abstractions for such
+    // a simple app? probably not. will maybe regret this later? probably yes. but for now, this is fine.
+    ui.sidebarScroll.update(CLAY_ID("sidebarScroll"), GetMouseWheelMoveV().y, GetFrameTime());
+
+    // hotkeys. will be extracted in its own class/function later on
     if (IsKeyPressed(KEY_F1)) {
         actions.push_back(action::ToggleHotkeys{});
     }

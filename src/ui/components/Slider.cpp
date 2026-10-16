@@ -58,6 +58,7 @@ std::optional<float> Slider(Clay_ElementId id, float value, const theme::SliderS
                         .attachPoints = { .element = CLAY_ATTACH_POINT_CENTER_CENTER, .parent = CLAY_ATTACH_POINT_RIGHT_CENTER },
                         .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
                         .attachTo = CLAY_ATTACH_TO_PARENT,
+                        .clipTo = CLAY_CLIP_TO_ATTACHED_PARENT,
                     },
                 }) {}
             }
