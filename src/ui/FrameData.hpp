@@ -13,6 +13,11 @@ class TextArena;
 // "All sounds" is not a real Board: it takes this reserved id, so real board ids start at 1
 inline constexpr BoardId allSoundsBoard = 0;
 
+// one rule for board counts and the grid filter
+inline bool inBoard(const SoundData &sound, BoardId board) {
+    return board == allSoundsBoard || sound.board == board;
+}
+
 struct UiState {
     BoardId selectedBoard = allSoundsBoard;
     SmoothScroll sidebarScroll;
