@@ -165,7 +165,13 @@ static inline void Clay__SuppressUnusedLatchDefinitionVariableWarning(void) { (v
 
 #define CLAY__INIT(type) type
 
+// soundbored patch: MSVC can't pack enums in C, so the C renderer sees 4-byte enums.
+// Use the same size in C++, or Clay_RenderCommand has a different layout on each side
+#if defined(_MSC_VER) && !defined(__clang__)
+#define CLAY_PACKED_ENUM enum
+#else
 #define CLAY_PACKED_ENUM enum : uint8_t
+#endif
 
 #define CLAY__DEFAULT_STRUCT {}
 
