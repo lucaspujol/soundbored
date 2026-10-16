@@ -23,7 +23,7 @@ jobs:
           - { name: Windows MSVC,  os: windows-latest }
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # raylib builds GLFW from source, which needs the X11 and OpenGL headers
       - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
       # FetchContent sources + their compiled objects (raylib is most of the build time).
       # New key when CMakeLists.txt changes, e.g. a dependency version bump
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: build/_deps
           key: deps-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt') }}
