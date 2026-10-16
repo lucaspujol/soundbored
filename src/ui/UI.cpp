@@ -71,6 +71,7 @@ std::vector<Action> UI::frame(const AppState &appState) {
     // and the main content area (sound grid). do i really need perfect abstractions for such
     // a simple app? probably not. will maybe regret this later? probably yes. but for now, this is fine.
     ui.sidebarScroll.update(CLAY_ID("sidebarScroll"), GetMouseWheelMoveV().y, GetFrameTime());
+    ui.gridScroll.update(CLAY_ID("gridScroll"), GetMouseWheelMoveV().y, GetFrameTime());
 
     // hotkeys. will be extracted in its own class/function later on
     if (IsKeyPressed(KEY_F1)) {

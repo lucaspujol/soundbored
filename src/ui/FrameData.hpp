@@ -21,6 +21,7 @@ inline bool inBoard(const SoundData &sound, BoardId board) {
 struct UiState {
     BoardId selectedBoard = allSoundsBoard;
     SmoothScroll sidebarScroll;
+    SmoothScroll gridScroll;
 };
 
 struct FrameData {
