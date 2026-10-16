@@ -4,8 +4,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
 endif()
 
-project(soundbored VERSION 0.1.0
-                   DESCRIPTION "Free to use soundboard for linux & windows"
+# no VERSION here: the git tag is the version (see docs/releasing.md)
+project(soundbored DESCRIPTION "Free to use soundboard for linux & windows"
                    LANGUAGES C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

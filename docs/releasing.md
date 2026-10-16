@@ -4,20 +4,21 @@ Pushing a `v*` tag runs `.github/workflows/release.yml`, which builds Windows an
 
 ## Steps
 
-1. Bump the version in `CMakeLists.txt`:
-   ```cmake
-   project(soundbored VERSION 0.2.0
-   ```
-2. Merge that change into `main` through a PR.
-3. Tag the merged commit and push the tag:
-   ```sh
-   git switch main && git pull
-   git tag v0.2.0
-   git push origin v0.2.0
-   ```
-4. Watch the run in the Actions tab. The release appears on the Releases page when it's green.
+The tag is the version: there's no version number to bump in the code.
 
-The tag must match the CMake version (`v0.2.0` ↔ `0.2.0`), or the workflow fails before building.
+```sh
+git switch main && git pull
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+Then watch the run in the Actions tab. The release appears on the Releases page when it's green.
+
+The workflow fails before building if:
+- the tag isn't `vX.Y.Z` (e.g. `v0.2`, `vtest`)
+- the tagged commit isn't on `main`. Tag only from an up-to-date `main`
+
+Only admins can create, move or delete `v*` tags (tag ruleset in the repo settings).
 
 ## What gets published
 
@@ -33,7 +34,7 @@ Each archive holds a `soundbored/` folder with the executable, `assets/` and `LI
 - Any PR that touches `release.yml` or `CMakeLists.txt` builds the packages.
 - Or run the workflow by hand: Actions tab → Release → Run workflow.
 
-Either way, the packages are attached to the run as artifacts. Nothing is published.
+Either way, the packages are attached to the run as artifacts, versioned `dev-<commit>`. Nothing is published.
 
 ## Fixing a bad release
 
@@ -41,4 +42,11 @@ Delete the release and the tag, fix, then tag again:
 
 ```sh
 gh release delete v0.2.0 --cleanup-tag
+```
+
+A tag pushed by mistake that didn't publish anything (its run failed the checks):
+
+```sh
+git push origin --delete v0.2.0
+git tag -d v0.2.0
 ```
