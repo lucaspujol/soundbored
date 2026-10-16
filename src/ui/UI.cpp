@@ -57,6 +57,12 @@ std::vector<Action> UI::frame(const AppState &appState) {
     Clay_SetLayoutDimensions({ (float)GetScreenWidth(), (float)GetScreenHeight() });
     Vector2 mouse = GetMousePosition();
     Clay_SetPointerState({ mouse.x, mouse.y }, IsMouseButtonDown(MOUSE_BUTTON_LEFT));
+    Vector2 wheel_raylib = GetMouseWheelMoveV();
+    Clay_Vector2 wheel = {
+        wheel_raylib.x * 4,
+        wheel_raylib.y * 4
+    };
+    Clay_UpdateScrollContainers(false, wheel, GetFrameTime());
 
     // debug panel
     if (IsKeyPressed(KEY_D)) {
