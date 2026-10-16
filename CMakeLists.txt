@@ -21,6 +21,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# MSVC: link the C runtime statically, so users don't need the VC++ redistributable.
+# Set before FetchContent so dependencies use it too (mixing runtimes fails to link)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# raylib asks for CMake 3.5, which ignores the line above (policy CMP0091). Force it on
+set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
+
 # raylib
 set(CUSTOMIZE_BUILD ON CACHE BOOL "" FORCE)
 set(SUPPORT_MODULE_RAUDIO OFF CACHE BOOL "" FORCE)
@@ -78,4 +84,8 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE winmm ole32)
     # UTF-8 process codepage, so narrow file APIs (fopen) accept UTF-8 paths
     target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/resources/soundbored.manifest)
+    # Release: GUI app, no console window. Keeps main() as the entry point instead of WinMain
+    if(MSVC)
+        target_link_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS;/ENTRY:mainCRTStartup>")
+    endif()
 endif()
