@@ -171,34 +171,8 @@ namespace {
         });
     }
 
-    void ScrollFade() {
-        constexpr int strips = 8;
-        CLAY(CLAY_ID("scrollFade"), Clay_ElementDeclaration{
-            .layout = {
-                .sizing = { .width = CLAY_SIZING_GROW(0) },
-                .layoutDirection = CLAY_TOP_TO_BOTTOM,
-            },
-            .floating = {
-                .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_BOTTOM, .parent = CLAY_ATTACH_POINT_LEFT_TOP },
-                .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-                .attachTo = CLAY_ATTACH_TO_PARENT,
-            }
-        }) {
-            for (int i = 1; i <= strips; ++i) {
-                Clay_Color c = theme::panel;
-                c.a = theme::panel.a * i / strips;
-                CLAY_AUTO_ID(Clay_ElementDeclaration{
-                    .layout = { .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_FIXED(4) } },
-                    .backgroundColor = c,
-                }) {}
-            }
-        }
-    }
-
     // TODO: real state once platform/ global hotkeys exist
     void HotkeyStatus(FrameData &frameData) {
-        Clay_ScrollContainerData d = Clay_GetScrollContainerData(CLAY_ID("sidebarScroll"));
-        const bool moreBelow = d.found && d.contentDimensions.height + d.scrollPosition->y > d.scrollContainerDimensions.height + 1;
         CLAY(CLAY_ID("hotkeyStatus"), Clay_ElementDeclaration{
             .layout = {
                 .sizing = { .width = CLAY_SIZING_GROW(0) },
@@ -207,9 +181,6 @@ namespace {
                 .childAlignment = { .y = CLAY_ALIGN_Y_CENTER },
             },
         }) {
-            if (moreBelow) {
-                ScrollFade();
-            }
             CLAY_AUTO_ID(Clay_ElementDeclaration{
                 .layout = { .sizing = { CLAY_SIZING_FIXED(8), CLAY_SIZING_FIXED(8) } },
                 .backgroundColor = frameData.state.settings.hotkeysActive ? theme::green : theme::red,
@@ -256,6 +227,7 @@ void Sidebar(FrameData &frameData) {
             OutputBlock(frameData);
             RetriggerBlock(frameData);
             BoardList(frameData);
+            ScrollFadeTopBottom(CLAY_ID("sidebarScroll"), theme::panel);
         }
         HotkeyStatus(frameData);
     }
