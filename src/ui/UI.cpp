@@ -1,15 +1,20 @@
 #include "raylib.h"
+
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
 #include "clay_renderer_raylib.h"
 
 #include "ui/UI.hpp"
+
 #include "ui/FontCache.hpp"
-#include "ui/sections/Header.hpp"
-#include "ui/sections/Sidebar.hpp"
 #include "ui/Icons.hpp"
+
 #include "ui/theme/Colors.hpp"
 #include "ui/theme/Layout.hpp"
+
+#include "ui/sections/Header.hpp"
+#include "ui/sections/Sidebar.hpp"
+#include "ui/sections/SoundGrid.hpp"
 
 #include <cstdio>
 #include <filesystem>
@@ -107,13 +112,7 @@ void UI::buildLayout(FrameData &frameData) {
             .backgroundColor = theme::background,
         }) {
             Sidebar(frameData);
-            CLAY(CLAY_ID("contentArea"), Clay_ElementDeclaration{
-                .layout = {
-                    .sizing = theme::expand,
-                    .layoutDirection = CLAY_TOP_TO_BOTTOM,
-                },
-                .backgroundColor = theme::background,
-            }) {}
+            SoundGrid(frameData);
         }
         CLAY(CLAY_ID("footer"), Clay_ElementDeclaration{
             .layout = {
