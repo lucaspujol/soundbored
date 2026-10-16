@@ -29,7 +29,7 @@ void apply(Action action, AppState& appState, AudioManager& audioManager) {
 
 int main(void) {
     AudioManager& audioManager = AudioManager::getInstance();
-    UI ui { 1920, 1080, "SoundBored" };
+    UI ui { 1400, 900, "SoundBored" };
     AppState appState = getStubAppState();
 
     displayAppState(appState);
