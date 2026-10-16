@@ -24,7 +24,7 @@ void handleClayErrors(Clay_ErrorData errorData) {
 
 UI::UI(int width, int height, const char *title) {
     Clay_Raylib_Initialize(width, height, title, FLAG_WINDOW_RESIZABLE);
-    SetWindowMinSize(800, 500);
+    SetWindowMinSize(850, 500);
 
     const uint64_t memSize = Clay_MinMemorySize();
     clayMemory = std::make_unique<char[]>(memSize);
