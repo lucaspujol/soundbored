@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # keep the other builds running when one fails, to see every broken platform at once
+      fail-fast: false
+      matrix:
+        include:
+          # 24.04: first image whose default GCC (13) ships <format>
+          - { name: Linux GCC,     os: ubuntu-24.04,   cc: gcc,   cxx: g++ }
+          - { name: Linux Clang,   os: ubuntu-24.04,   cc: clang, cxx: clang++ }
+          - { name: Windows MSVC,  os: windows-latest }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # raylib builds GLFW from source, which needs the X11 and OpenGL headers
+      - name: Install dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev
+
+      # FetchContent sources + their compiled objects (raylib is most of the build time).
+      # New key when CMakeLists.txt changes, e.g. a dependency version bump
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: deps-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt') }}
+
+      # CMake picks the compiler from CC / CXX. Empty on Windows, so it falls back to MSVC
+      - name: Configure
+        run: cmake -B build
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+
+      # --config is needed on Windows (Visual Studio builds several configs), ignored on Linux
+      - name: Build
+        run: cmake --build build --config Debug --parallel
