@@ -4,6 +4,7 @@
 
 #include "data/Actions.hpp"
 #include "data/AppState.hpp"
+#include "ui/SmoothScroll.hpp"
 
 class FontCache;
 class Icons;
@@ -14,6 +15,7 @@ inline constexpr BoardId allSoundsBoard = 0;
 
 struct UiState {
     BoardId selectedBoard = allSoundsBoard;
+    SmoothScroll sidebarScroll;
 };
 
 struct FrameData {
