@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  # manual run from the Actions tab: builds the packages without publishing anything
+  workflow_dispatch:
+  # also on PRs touching the release setup, so packaging breaks show up before a real release
+  pull_request:
+    paths:
+      - .github/workflows/release.yml
+      - CMakeLists.txt
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 22.04 on purpose: its older glibc (2.35) lets the binary run on more distros
+          - { name: Linux,   os: ubuntu-22.04,   platform: linux-x64 }
+          - { name: Windows, os: windows-latest, platform: windows-x64 }
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 22.04's default GCC 11 has no <format>: GCC 13 comes from the toolchain PPA
+      - name: Install dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y g++-13 libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev
+
+      # GCC 13's libstdc++ is newer than what most distros ship, so it goes inside the binary
+      - name: Configure (Linux)
+        if: runner.os == 'Linux'
+        run: >
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
+          "-DCMAKE_EXE_LINKER_FLAGS=-static-libstdc++ -static-libgcc"
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -B build
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Read version
+        run: echo "VERSION=$(sed -n 's/^project(soundbored VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)" >> "$GITHUB_ENV"
+
+      # the app loads assets/ next to the executable, so both go in the same folder
+      - name: Package
+        run: |
+          name="soundbored-$VERSION-${{ matrix.platform }}"
+          mkdir -p "dist/soundbored"
+          cp -r assets LICENSE "dist/soundbored/"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            cp soundbored.exe "dist/soundbored/"
+            (cd dist && 7z a "$name.zip" soundbored)
+          else
+            cp soundbored "dist/soundbored/"
+            tar -czf "dist/$name.tar.gz" -C dist soundbored
+          fi
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: |
+            dist/*.zip
+            dist/*.tar.gz
+          if-no-files-found: error
