@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  # pushing a tag like v0.1.0 builds and publishes a GitHub Release
+  push:
+    tags: ['v*']
   # manual run from the Actions tab: builds the packages without publishing anything
   workflow_dispatch:
   # also on PRs touching the release setup, so packaging breaks show up before a real release
@@ -30,6 +33,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Read version
+        run: echo "VERSION=$(sed -n 's/^project(soundbored VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)" >> "$GITHUB_ENV"
+
+      # before the build, so a mistyped tag fails in seconds
+      - name: Check tag matches version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          if [ "$GITHUB_REF_NAME" != "v$VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match CMakeLists.txt version $VERSION"
+            exit 1
+          fi
+
       # 22.04's default GCC 11 has no <format>: GCC 13 comes from the toolchain PPA
       - name: Install dependencies
         if: runner.os == 'Linux'
@@ -53,9 +68,6 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
-      - name: Read version
-        run: echo "VERSION=$(sed -n 's/^project(soundbored VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)" >> "$GITHUB_ENV"
-
       # the app loads assets/ next to the executable, so both go in the same folder
       - name: Package
         run: |
@@ -78,3 +90,26 @@ jobs:
             dist/*.zip
             dist/*.tar.gz
           if-no-files-found: error
+
+  publish:
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the release
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      # lets users check their download isn't corrupted: sha256sum -c SHA256SUMS
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS
+
+      # --generate-notes lists the PRs merged since the previous tag
+      - name: Create release
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
