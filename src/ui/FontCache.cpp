@@ -1,6 +1,6 @@
 #include "ui/FontCache.hpp"
-#include "clay_renderer_raylib.h"
 
+#include <algorithm>
 #include <array>
 #include <string>
 #include <string_view>
@@ -50,7 +50,31 @@ uint16_t FontCache::idFor(theme::font::Face face, uint16_t size) {
     return id;
 }
 
+// replaces Raylib_MeasureText, which indexes glyphs per byte: any UTF-8 character ("·", "é")
+// reads out of bounds. Decodes codepoints and advances like DrawTextEx, so measure matches drawing
 Clay_Dimensions FontCache::measure(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData) {
     FontCache *cache = static_cast<FontCache*>(userData);
-    return Raylib_MeasureText(text, config, cache->data());
+    Font font = cache->fonts[config->fontId];
+    if (!font.glyphs) {
+        font = GetFontDefault();
+    }
+    const float scale = config->fontSize / static_cast<float>(font.baseSize);
+
+    float line = 0;
+    float widest = 0;
+    for (int i = 0; i < text.length;) {
+        int bytes = 0;
+        const int codepoint = GetCodepointNext(text.chars + i, &bytes);
+        i += bytes;
+        if (codepoint == '\n') {
+            widest = std::max(widest, line);
+            line = 0;
+            continue;
+        }
+        const int g = GetGlyphIndex(font, codepoint);
+        const float advance = font.glyphs[g].advanceX != 0 ? font.glyphs[g].advanceX
+                                                           : font.recs[g].width + font.glyphs[g].offsetX;
+        line += advance * scale + config->letterSpacing;
+    }
+    return { std::max(widest, line), static_cast<float>(config->fontSize) };
 }
