@@ -2,6 +2,7 @@
 
 #include <miniaudio.h>
 
+#include <cstdint>
 #include <string>
 #include <memory>
 #include <stdexcept>
