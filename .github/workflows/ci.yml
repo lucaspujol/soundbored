@@ -32,6 +32,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgl1-mesa-dev
 
+      # FetchContent sources + their compiled objects (raylib is most of the build time).
+      # New key when CMakeLists.txt changes, e.g. a dependency version bump
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: deps-${{ matrix.name }}-${{ hashFiles('CMakeLists.txt') }}
+
       # CMake picks the compiler from CC / CXX. Empty on Windows, so it falls back to MSVC
       - name: Configure
         run: cmake -B build
