@@ -22,3 +22,5 @@ struct Keybind {
     int key;
     uint8_t mods;
 };
+
+enum class OutputSlot { Monitor, Mic };

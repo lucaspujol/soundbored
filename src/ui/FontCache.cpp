@@ -14,7 +14,7 @@ namespace {
         "IBMPlexSans-SemiBold.ttf",
         "IBMPlexMono-Medium.ttf",
     });
-    static_assert(files.size() == theme::font::face_count, "every Face needs exactly one file");
+    static_assert(files.size() == static_cast<uint16_t>(theme::font::Face::face_count), "every Face needs exactly one file");
 }
 
 FontCache::FontCache(std::filesystem::path dir) : dir(std::move(dir)) {}
@@ -39,7 +39,7 @@ uint16_t FontCache::idFor(theme::font::Face face, uint16_t size) {
         return found->second;
     }
 
-    const std::string path = (dir / files[face]).string();
+    const std::string path = (dir / files[static_cast<size_t>(face)]).string();
     Font font = LoadFontEx(path.c_str(), size, nullptr, 400);
     
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
