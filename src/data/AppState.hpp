@@ -7,8 +7,7 @@
 #include <string>
 #include <vector>
 
-// TODO: MAYBE RENAME TO SOUNDMETA? name already in use in @audio/AudioManager.hpp
-struct SoundData {
+struct SoundMeta {
     SoundId id;
     std::string name;
     std::string path;
@@ -30,7 +29,7 @@ struct Output {
 };
 
 struct Library {
-    std::vector<SoundData> sounds;
+    std::vector<SoundMeta> sounds;
     std::vector<Board> boards;
 };
 

@@ -165,7 +165,7 @@ namespace {
         Block(frameData, CLAY_ID("boardsBlock"), CLAY_STRING("BOARDS"), [&] {
             BoardRow(frameData, allSoundsBoard, CLAY_STRING("All sounds"), library.sounds.size());
             for (const Board &board : library.boards) {
-                const auto count = std::ranges::count(library.sounds, board.id, &SoundData::board);
+                const auto count = std::ranges::count(library.sounds, board.id, &SoundMeta::board);
                 BoardRow(frameData, board.id, ToClay(board.name), static_cast<size_t>(count));
             }
         });
