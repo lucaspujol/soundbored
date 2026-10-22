@@ -45,9 +45,26 @@ struct Playback {
     uint64_t positionMs;
 };
 
+struct PersistentState {
+    Library library;
+    Settings settings;
+
+    bool valid() { return false; }; // TODO impl
+};
+
 struct AppState {
     Library library;
     Settings settings;
     Playback playback;
     std::vector<std::string> devices;
+};
+
+// Note that sound related data must still be read and updated from actual audio files (eg. durationMs)
+inline AppState fromPersisted(PersistentState state) {
+    return {
+        .library = state.library,
+        .settings = state.settings,
+        .playback = {},
+        .devices = {}
+    };
 };
