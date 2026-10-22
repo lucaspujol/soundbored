@@ -26,7 +26,7 @@ cmake --build build
 - `AudioEngine`: owns one `ma_engine` per output device (a monitor device plus an optional "mic" device such as a virtual cable) and plays each sound on both.
 - `DeviceManager`: enumerates playback devices and handles hot-plug by re-enumerating and re-initializing engines when a device disappears.
 - `SoundLibrary`: the imported sounds, with per-sound volume and keybind.
-- `Config`: saves and loads JSON. Devices are stored by **name**, not ID, because IDs aren't stable across reboots.
+- `Config`: saves and loads the config file through [cord](https://github.com/louisbgl/cord-cpp). Devices are stored by **name**, not ID, because IDs aren't stable across reboots.
 - `UI`: builds the Clay layout each frame and holds no audio logic.
 
 ## Rules
