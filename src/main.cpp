@@ -3,7 +3,6 @@
 #include "data/AppState.hpp"
 #include "StubState.hpp"
 #include "ui/UI.hpp"
-#include "common/Config.hpp"
 #include "utils/overloaded.hpp"
 #include <iostream>
 
@@ -31,15 +30,7 @@ void apply(Action action, AppState& appState, AudioManager& audioManager) {
 int main(void) {
     AudioManager& audioManager = AudioManager::getInstance();
     UI ui { 1400, 900, "SoundBored" };
-    // TODO: create a proper app state loader
-    auto savedState = Config::load();
-    AppState stubState = getStubAppState();
-    AppState appState{};
-    if (savedState) {
-        appState = fromPersisted(savedState.value());
-        appState.devices = stubState.devices;
-    }
-    else appState = stubState;
+    AppState appState = getStubAppState();
 
     displayAppState(appState);
     while (!ui.shouldClose()) {
@@ -47,6 +38,5 @@ int main(void) {
         for (const Action& action : actions)
             apply(action, appState, audioManager);
     }
-    Config::save(appState.library, appState.settings, appState.playback);
     return 0;
 }
