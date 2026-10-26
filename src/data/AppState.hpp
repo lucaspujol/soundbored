@@ -48,6 +48,7 @@ struct Playback {
 struct PersistentState {
     Library library;
     Settings settings;
+    Playback playback;
 
     bool valid() { return false; }; // TODO impl
 };
@@ -64,7 +65,7 @@ inline AppState fromPersisted(PersistentState state) {
     return {
         .library = state.library,
         .settings = state.settings,
-        .playback = {},
+        .playback = state.playback,
         .devices = {}
     };
 };
