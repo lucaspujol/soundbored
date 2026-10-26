@@ -49,8 +49,6 @@ struct PersistentState {
     Library library;
     Settings settings;
     Playback playback;
-
-    bool valid() { return false; }; // TODO impl
 };
 
 struct AppState {
