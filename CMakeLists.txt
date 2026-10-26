@@ -48,7 +48,8 @@ FetchContent_MakeAvailable(miniaudio)
 # cord (header-only)
 FetchContent_Declare(cord
     GIT_REPOSITORY https://github.com/louisbgl/cord-cpp.git
-    GIT_TAG 191a3f7a0b7f57ce595b85c58d5bc8a909c10764    # main on 2026-09-28. Shallow clones can't fetch a commit hash
+    GIT_TAG v1.0.1
+    GIT_SHALLOW TRUE
     )
 FetchContent_MakeAvailable(cord)
 

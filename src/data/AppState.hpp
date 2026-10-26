@@ -7,8 +7,7 @@
 #include <string>
 #include <vector>
 
-// TODO: MAYBE RENAME TO SOUNDMETA? name already in use in @audio/AudioManager.hpp
-struct SoundData {
+struct SoundMeta {
     SoundId id;
     std::string name;
     std::string path;
@@ -30,7 +29,7 @@ struct Output {
 };
 
 struct Library {
-    std::vector<SoundData> sounds;
+    std::vector<SoundMeta> sounds;
     std::vector<Board> boards;
 };
 
@@ -46,9 +45,25 @@ struct Playback {
     uint64_t positionMs;
 };
 
+struct PersistentState {
+    Library library;
+    Settings settings;
+    Playback playback;
+};
+
 struct AppState {
     Library library;
     Settings settings;
     Playback playback;
     std::vector<std::string> devices;
+};
+
+// Note that sound related data must still be read and updated from actual audio files (eg. durationMs)
+inline AppState fromPersisted(PersistentState state) {
+    return {
+        .library = state.library,
+        .settings = state.settings,
+        .playback = state.playback,
+        .devices = {}
+    };
 };

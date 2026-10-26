@@ -44,15 +44,6 @@ AppState getStubAppState() {
     };
 }
 
-std::string retriggerModeToString(RetriggerMode mode) {
-    switch (mode) {
-        case RetriggerMode::Overlap: return "Overlap";
-        case RetriggerMode::Restart: return "Restart";
-        case RetriggerMode::Stop: return "Stop";
-        default: return "Unknown";
-    }
-}
-
 void displayAppState(const AppState &appState) {
     std::cout << "\nSettings:\n";
     std::cout << std::format("  Physical Output: {} (volume: {})\n",
